@@ -4,7 +4,7 @@
 import pytest
 
 
-from .. import simple_cpu
+from ..simple_cpu import *
 
 
 

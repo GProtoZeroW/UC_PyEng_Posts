@@ -7,6 +7,7 @@ import json
 import re
 import warnings
 from datetime import datetime
+from typing import Union
 
 
 
@@ -16,35 +17,48 @@ class Notebook_Writefile_Extractor:
     for the software.
 
     Args:
-        file_and_paths_dict (dict): A dictionary containing the file names and corresponding paths.
+        notebook_path (Union[str, Path]): The file path to the Jupyter notebook. This can be 
+                                          specified either as a string or as a Path object. 
+                                          The path should point to the location of the notebook file.
+        default_output_path (Path; Path.cwd()): the default path for the exported cell contents with a default value of `Path.cwd()` 
+            The file paths for each file to write to can be later changed for each file via the `self.files_and_paths` setter.
 
-    Attributes:
-        file_and_paths_dict: A dictionary containing the file names and corresponding paths.
-
-    Raises:
-        AttributeError: If `self.find_writefile_in_cells` has not been run first to get `self._files_and_paths`.
-        ValueError: If `file_and_paths_dict` is not a dictionary.
-        ValueError: If `file_and_paths_dict` does not have the same keys as `self._files_and_paths`.
-        ValueError: If `file_and_paths_dict` contains non pathlib Path object values for some keys.    
     """
-    def __init__(self, notebook_path, default_output_path=Path.cwd()):
+    def __init__(self, notebook_path:Union[str, Path], default_output_path:Path =Path.cwd()):
         """
-        Construct an instance of the Notebook_Writefile_Extractor class.
+        Construct an instance of the Notebook_Writefile_Extractor class. Will then check the input args and then load in the given jupyter/ipython notebook from  `notebook_path`.
+        Will then proceed to read in the notebook followed by parsing it for instances of `%%writefile`\`#%%writefile`.
+        
 
         Args:
-            notebook_path (:obj:`str`): The path to the jupyter notebook.
-            default_output_path (:Path ob:`str`, optional; default=Path.cwd() current working directory): The default output
-                directory for the files produced. Defaults to current working directory.
+             notebook_path (Union[str, Path]): The file path to the Jupyter notebook. This can be 
+                                          specified either as a string or as a Path object. 
+                                          The path should point to the location of the notebook file.
+            
+            default_output_path (Path; Path.cwd()): the default path for the exported cell contents with a default value of `Path.cwd()` 
+              The file paths for each file to write to can be later changed for each file via the `self.files_and_paths` setter.
+
+        Creates:
+            self.notebook_path (Path): the target notebook's Path to then parse 
+            self.default_output_path: the default output directory path files found in `%%writefile`\`#%%writefile`.
+        
+        Modifies:
+            None
+        Returns:
+            None
         """
+        #set to attr and then verfiy the target notebook
         self.notebook_path=Path(notebook_path)
         self.notebook_path_check()
-    
+
+        #check the default output and store to attr
         self.default_output_path=Path(default_output_path)
         self.output_path_check(self.default_output_path)
 
         
-
+        #read in the target notebook
         self.load_notebook()
+        #parse the target notebook for `%%writefile`\`#%%writefile`
         self.find_writefile_in_cells()
 
     def notebook_path_check(self):
@@ -53,6 +67,15 @@ class Notebook_Writefile_Extractor:
 
         The method checks if the provided path is valid, is a file, is existing and has a suffix of ".ipynb" (i.e.,
         it is a Jupyter notebook file).
+
+        Args:
+            None
+        Creates:
+            None
+        Modifies:
+            None
+        Returns:
+            None
 
         Raises:
             ValueError: If the notebook path does not have a ".ipynb" suffix, is not a file or does not exist.
@@ -72,14 +95,14 @@ class Notebook_Writefile_Extractor:
         """
         Validates the provided directory path.
 
-        This method checks if the provided directory path is a valid output directory by making sure it is not a file
+        This method tries to check if the provided directory path is a valid output directory by making sure it is not a file
         or a symbolic link. If it is valid, the absolute path to it is returned.
 
         Args:
-            dir_path (:obj:`str`): The path of the potential output directory.
+            dir_path (Union[str, Path]): The path of the potential output directory.
 
         Returns:
-             :Pathlib Path: The resolved absolute path of the directory.
+             - Path: The resolved absolute path of the directory.
 
         Raises:
             ValueError: If the directory path is a file or a symbolic link.
@@ -100,16 +123,19 @@ class Notebook_Writefile_Extractor:
 
     def load_notebook(self):
         """
-        Load the notebook file into a JSON object.
+        Load the target notebook (self.notebook_path) file into a JSON object.
 
         The method opens the notebook file specified by the notebook_path attribute, reads it and loads it into a
-        JSON object which is then stored in the notebook_json attribute of the object.
+        JSON object, which is then stored in the notebook_json attribute of the object.
 
-        Note:
-
+        Args:
+            None
 
         Creates:
             self.notebook_json (json object): This method creates the self.notebook_json attribute.
+
+        Modifies:
+            None
 
         Returns:
             None
@@ -130,24 +156,31 @@ class Notebook_Writefile_Extractor:
         If the cell includes this command, it extracts the file name, checks if the file is appended or overwritten, gets the cell
         content and type and stores this information in the cells_with_writefile dictionary.
 
-        Raises:
-            AttributeError: If this method is called before running the load_notebook method.
+        Args:
+            None
 
         Creates:
             self.cells_with_writefile (dict [str:dict]): A nested dictionary with the outer key being the cell number in the
               json source for the notebook and the inner keys being:
                 -file(str): the file the `%%writefile` is pointing to
                 - append_flag (bool): True if the found `%%writefile` has the `-a` append flag set in it
-                - cell_type (str): the type of jupyter/ipython notebook cell the was parsed contiang the match to `%%writefile`
-                - content (str): the content of the cell the was parsed contiang the match to `%%writefile`
+                - cell_type (str): the type of jupyter/ipython notebook cell that was parsed containing the match to `%%writefile`
+                - content (str): the content of the cell that was parsed contains the match to `%%writefile`
 
-            self._files_and_header_text (dict [str:str]; used for ext property getter/setter): a dictionary with the key being the unique file names found from the above matchs
-                and the values being the header text to add and here will be an empty string
-            self._files_and_paths (dict [str:Pathlib.Path]; used for ext property getter/setter): a dictionary key being the unique file names found from the above matchs
-                and the values being set to `self.default_output_path` here
+            self._files_and_header_text (dict [str:str]): used for ext property getter/setter dictionary with the key being the unique file names found from the above matches
+                and the values being the header text to add and where here all will be set to an empty string. The headers can be set individually using `self.files_and_header_text`
+            
+            self._files_and_paths (dict [str:Path]): used for ext property getter/setter dictionary key being the unique file names found from the above matches
+                and the values being set to `self.default_output_path` here. The output directory paths can be set individually using `self.files_and_paths`
+
+        Modifies:
+            None
 
         Returns:
             None
+
+        Raises:
+            AttributeError: If this method is called before running the load_notebook method.
         """
         if hasattr(self, 'notebook_json')==False:
             raise AttributeError('Need to run `self.load_notebook` to get `self.notebook_json` first')
@@ -229,7 +262,6 @@ class Notebook_Writefile_Extractor:
             if v['append_flag']==False:
                 self.file_N_no_append_flags_count[v['file']]=self.file_N_no_append_flags_count.get(v['file'], 0)+1
 
-            #TODO: add a check to make sure the no append flag is the lowest value cell for a given file
         
         for k,v in self.file_N_no_append_flags_count.items():
             if v==0:
@@ -239,7 +271,8 @@ class Notebook_Writefile_Extractor:
 
     @property
     def files_and_paths(self):
-        """Returns the files and paths obtained by running `self.find_writefile_in_cells`.
+        """
+        Returns the files and paths obtained by running `self.find_writefile_in_cells`.
 
         Note:
             This method raises an AttributeError if `self.find_writefile_in_cells` hasn't been run yet to get `self._files_and_paths`.
@@ -263,14 +296,25 @@ class Notebook_Writefile_Extractor:
 
     @files_and_paths.setter
     def files_and_paths(self, file_and_paths_dict):
-        """Sets the files and paths for the software.
+        """
+        Sets the files and output directory path for each unique found file from the parsed notebook.
 
         This method validates and sets the '_files_and_paths' attribute with given dictionary.
         It also throws exceptions if preconditions are not met and triggers the creation of
         the relative paths from source notebook to output files.
 
         Args:
-            file_and_paths_dict (dict): A dictionary containing the file names and corresponding paths.
+            file_and_paths_dict (dict[str:Unioin[Path, str]]): A dictionary containing the file names and corresponding paths.
+
+        Creates:
+            None
+
+        Modifies:
+            self._files_and_paths (dict): Stores the updated file paths, dictionary key is filename and value is full path of that file.
+
+        Returns:
+            None
+
 
         Raises:
             AttributeError: If `self.find_writefile_in_cells` has not been run first to get `self._files_and_paths`.
@@ -278,11 +322,10 @@ class Notebook_Writefile_Extractor:
             ValueError: If `file_and_paths_dict` does not have the same keys as `self._files_and_paths`.
             ValueError: If `file_and_paths_dict` contains non pathlib.Path object values for some keys.
 
-        Attributes modified:
-            self._files_and_paths (dict): Stores the updated file paths, dictionary key is filename and value is full path of that file.
-
+        
         Note:
             This setter also calls the `self.output_path_check(v)` for each key-value pair in dictionary and `self.files_rpaths_to_source_nb_maker()` to remap the relative paths after setting the new values.
+        
         """
         if hasattr(self, '_files_and_paths')==False:
             raise AttributeError('Need to run `self.find_writefile_in_cells` fist to get self._files_and_paths')
@@ -312,15 +355,22 @@ class Notebook_Writefile_Extractor:
         Args:
             file_and_paths_dict (dict): A dictionary containing the file names and corresponding paths.
 
+        Creates:
+            None
+
+        Modfies:
+            self._files_and_paths (dict): Stores the updated file paths, dictionary key is filename and value is full path of that file.
+
+        Retuns:
+            None
+
         Raises:
             AttributeError: If `self.find_writefile_in_cells` has not been run first to get `self._files_and_paths`.
             ValueError: If `file_and_paths_dict` is not a dictionary.
             ValueError: If `file_and_paths_dict` does not have the same keys as `self._files_and_paths`.
             ValueError: If `file_and_paths_dict` contains non pathlib.Path object values for some keys.
 
-        Attributes modified:
-            self._files_and_paths (dict): Stores the updated file paths, dictionary key is filename and value is full path of that file.
-
+        
         Note:
             This setter also calls the `self.output_path_check(v)` for each key-value pair in dictionary and `self.files_rpaths_to_source_nb_maker()` to remap the relative paths after setting the new values.
         """
@@ -332,7 +382,8 @@ class Notebook_Writefile_Extractor:
 
     @property
     def files_and_header_text(self):
-        """Property to get the files and their corresponding header texts.
+        """
+        Property to get the files and their corresponding header texts.
 
         This attribute is set within the `self.find_writefile_in_cells` method, so this
         property will raise an AttributeError if `self.find_writefile_in_cells` has not been run yet.
@@ -340,8 +391,12 @@ class Notebook_Writefile_Extractor:
         Attributes read:
             _files_and_header_text (dict): A dictionary containing files as keys and header text as values.
 
+        Creates:
+            None
+        
         Returns:
-            _files_and_header_text (dict): The dictionary of files and their header texts.
+            -(dict[Path, str]): The dictionary of files and their header texts. 
+        
 
         Raises:
             AttributeError: If `self.find_writefile_in_cells` has not been run yet to set `self._files_and_header_text`.
@@ -356,18 +411,22 @@ class Notebook_Writefile_Extractor:
 
     @files_and_header_text.setter
     def files_and_header_text(self, files_and_header_text_dict):
-        """Assigns values to the `files_and_header_text` attribute.
+        """
+        Assigns values to the `files_and_header_text` attribute.
 
         This method sets the `files_and_header_text` attribute of the class, which is a dictionary containing file names as keys and header text as values. It checks if the `find_writefile_in_cells` method has been run to populate `self._files_and_header_text`, and if not, an AttributeError is raised. Also, it validates that the input dictionary has similar keys with `self._files_and_header_text`.
 
         Args:
             files_and_header_text_dict (dict): A dictionary containing file names as keys and header text as values.
 
-        Attributes created:
+        Creates:
             None
 
-        Attributes modified:
+        Modifies:
             self._files_and_header_text (dict): This attribute stores the dictionary representing the correlation between files and header text.
+
+        Returns:
+            None
 
         Raises:
             AttributeError: If `self.find_writefile_in_cells` has not been run first to get `self._files_and_header_text`.
@@ -392,7 +451,8 @@ class Notebook_Writefile_Extractor:
         
     
     def make_content_for_files(self, cell_types_to_write='all'):
-        """Generates content for files based on specified cell types.
+        """
+        Generates content for files based on specified cell types.
 
         This method creates `file_and_content`, a dictionary in which keys are the names of files
         and values are their respective content. Each file's content is built based on the types of cells
@@ -404,20 +464,23 @@ class Notebook_Writefile_Extractor:
         Among the valid options for `cell_types_to_write` are 'all', 'code', 'code_and_markdown', 'markdown',
         'code_raw', 'raw', 'markdown_raw'. If an invalid option is given, it raises a `ValueError`.
 
-        Note:
-            This method creates and modifies the `file_and_content` attribute. This attribute is a dictionary
-            where each key-value pair represents a file name and its corresponding content.
 
         Args:
             cell_types_to_write (:obj:`str`, optional; default: 'all'): The types of cells to include in
                 the generated content. The default is 'all', which includes all types of cells. The other
-                valid values are: 'code', 'code_and_markdown', 'markdown', 'code_raw', 'raw', 'markdown_raw'.
+                valid values are: 
+                -'code': only generate output from code cells with `%%writefile`
+                -'code_and_markdown': only generate output from code and markdown cells with `%%writefile`
+                -'markdown': only generate output from markdown cells with `%%writefile`
+                -'code_raw': only generate output from code and raw cells with `%%writefile`
+                -'raw': only generate output from raw cells with `%%writefile`
+                -'markdown_raw': only generate output from markdown and raw cells with `%%writefile`
 
-        Attributes created:
+        Creates:
             self.file_and_content (dict): A dictionary in which keys are the names of the files and values
                 are their corresponding content.
 
-        Attributes modified:
+        Modifies:
             None
 
         Returns:
@@ -461,19 +524,32 @@ class Notebook_Writefile_Extractor:
 
     def write_to_files(self, cell_types_to_write='all'):
         """
-        Find cells with `%%writefile` or `#%%writefile` command at the start of a line in a notebook cell.
-
-        This method finds the cells with `%%writefile` or `#%%writefile`, extracts the file name, cell type and its content,
-        and stores this information in the cells_with_writefile dictionary.
-
-        Raises:
-            AttributeError: If this method is called before running the load_notebook method.
-
-        Note:
-            This method creates the attribute self.cells_with_writefile.
-
+        Writes the generated content to the files as specified in `self.file_and_content`. This method 
+        iterates over the prepared content for each file, creating or overwriting files on disk. 
+    
+        Args:
+            cell_types_to_write (str; default='all'): Specifies which types of cells to include in the output,
+                                                      affecting which content is written to files.
+                valid values are: 
+                -'code': only generate output from code cells with `%%writefile`
+                -'code_and_markdown': only generate output from code and markdown cells with `%%writefile`
+                -'markdown': only generate output from markdown cells with `%%writefile`
+                -'code_raw': only generate output from code and raw cells with `%%writefile`
+                -'raw': only generate output from raw cells with `%%writefile`
+                -'markdown_raw': only generate output from markdown and raw cells with `%%writefile`
+    
         Returns:
-            None
+            Explicit:
+                None
+                    
+            Implicit:
+                - Creates or overwrites files in the specified output directory based on the
+                  content prepared in `self.file_and_content`. Each file's path and name are
+                  determined by the mapping established in `self._files_and_paths`.
+    
+        Raises:
+            AttributeError: If `self.file_and_content` or `self._files_and_paths` have not
+                            been properly initialized before calling this method.
         """
         if hasattr(self, 'file_and_content')==False:
             self.make_content_for_files(cell_types_to_write=cell_types_to_write)
