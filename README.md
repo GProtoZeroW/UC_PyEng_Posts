@@ -9,4 +9,12 @@ A collection of posts about leveraging Python for engineering tasks, this reposi
 The name of this collection pays homage to the Universal Century timeline in the Gundam franchise because I am that level of a nerd.
 
 ## Long:
-Tree of Subjects and Post:
+Tree of Subjects and Posts:
+
+- **IDE Tips**
+  - *Environment Discovery*: [environment_discovery.py](./IDE_Tips/Environment_Discovery/environment_discovery.py) - *InProgress*
+- **Jupyter Tips**
+  - **Better Writefile Extractor Tool**: *Tool for fine-grain control of extracting content from Jupyter Notebook cells*
+    - [Better_Jupyter_Writefile_Extractor_Tool_DevNB.ipynb](./Jupyter_Tips/Better_Writefile_Extractor_Tool/Better_Jupyter_Writefile_Extractor_Tool_DevNB.ipynb) - *Writeup and source notebook for a fine-grain cell content extractor based on `%%writefile`/`#%%writefile` cell magics*
+    - [jupyter_writefile_extractor.py](./Jupyter_Tips/Better_Writefile_Extractor_Tool/jupyter_writefile_extractor.py) - *Extracted core code from [Better_Jupyter_Writefile_Extractor_Tool_DevNB.ipynb](./Jupyter_Tips/Better_Writefile_Extractor_Tool/Better_Jupyter_Writefile_Extractor_Tool_DevNB.ipynb)*
+    - [Dummy_CPU_DevNB.ipynb](./Jupyter_Tips/Better_Writefile_Extractor_Tool/Dummy_CPU_DevNB.ipynb) - *Example Jupyter notebook to try the extraction tool on, showing simple CPU elements in Python*
