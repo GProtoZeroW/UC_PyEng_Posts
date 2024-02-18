@@ -4,6 +4,9 @@
 import pytest
 
 
+from .. import simple_cpu
+
+
 
 alu = ALU()
 
