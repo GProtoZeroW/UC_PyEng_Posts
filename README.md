@@ -12,7 +12,9 @@ The name of this collection pays homage to the Universal Century timeline in the
 Tree of Subjects and Posts:
 
 - **IDE Tips**
-  - *Environment Discovery*: [environment_discovery.py](./IDE_Tips/Environment_Discovery/environment_discovery.py) - *InProgress*
+  - **Environment Discovery**: *Tool for finding out where in your local world did python just run at*
+    - [Python_Running_Environment_Discoverer_DevNB.ipynb](./IDE_Tips/Environment_Discovery/Python_Running_Environment_Discoverer_DevNB.ipynb) - *Quick post on some python code to find out about where your python script just ran on & in including: OS, path-to, in a Virtual Environment, Environment Path & Name, is it a Docker*
+    - [py_running_environment_discoverer.py](./IDE_Tips/Environment_Discovery/py_running_environment_discoverer.py) - *Extracted code from `Python_Running_Environment_Discoverer_DevNB.ipynb`*
 - **Jupyter Tips**
   - **Better Writefile Extractor Tool**: *Tool for fine-grain control of extracting content from Jupyter Notebook cells*
     - [Better_Jupyter_Writefile_Extractor_Tool_DevNB.ipynb](./Jupyter_Tips/Better_Writefile_Extractor_Tool/Better_Jupyter_Writefile_Extractor_Tool_DevNB.ipynb) - *Writeup and source notebook for a fine-grain cell content extractor based on `%%writefile`/`#%%writefile` cell magics*
