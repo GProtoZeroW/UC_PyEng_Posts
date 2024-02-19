@@ -1,3 +1,7 @@
+#Exstracted from source notebook with relative path this files initial creation: ../Python_Running_Environment_Discoverer_DevNB.ipynb
+
+
+
 import os
 import platform
 import sys
@@ -5,11 +9,12 @@ from pathlib import Path
 
 
 
-######################
-#enviorment inspection
-######################
+########################
+# Environment Inspection
+########################
 
-#usefull when working with pycharm, windows, wsl, and conda
+#getters
+# Useful when working with PyCharm, Windows, WSL, and Conda
 
 def get_os():
     system = platform.system()
@@ -54,9 +59,16 @@ def get_docker_container_id():
 def get_current_path():
     return os.getcwd()
 
+
+
+
+#print outs
 # Print system information
 print(f"Operating System: {get_os()}")
 print(f"Current Path: {get_current_path()}")
+
+# Print Python version
+print(f"Python Version: {sys.version}")
 
 venv_info = get_virtual_env_info()
 print(f"Running in Virtual Environment: {'Yes' if venv_info['is_virtual_env'] else 'No'}")
