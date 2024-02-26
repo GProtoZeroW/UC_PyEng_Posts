@@ -11,8 +11,8 @@ The name of this collection pays homage to the Universal Century timeline in the
 ## Long:
 Tree of Subjects and Posts:
 - **Electrical Engineering**
-  - **Single RF Connectors Crip Sheet**
-    - [Single_RF_Connectors_Crip_Sheet.pdf](./Electrical Engineering/Single RF Connectors Crip Sheet/Single_RF_Connectors_Crip_Sheet.pdf) -*Crib(Cheet) Sheet of Single RF Connectors, Torque values, Pin Depths, Wrench Sizes, Maury MW ColorConnect info, Connector Cross-Sections, Table of those other RF Connectors, and Standard WaveGuide Information*
+  - **Single RF Connectors Crib Sheet**
+    - [Single_RF_Connectors_Crib_Sheet.pdf](./Electrical_Engineering/Single_RF_Connectors_Crib_Sheet/Single_RF_Connectors_Crib_Sheet.pdf) -*Crib(Cheet) Sheet of Single RF Connectors, Torque values, Pin Depths, Wrench Sizes, Maury MW ColorConnect info, Connector Cross-Sections, Table of those other RF Connectors, and Standard WaveGuide Information*
 
 - **IDE Tips**
   - **Environment Discovery**: *Tool for finding out where in your local world did python just run at*
